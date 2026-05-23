@@ -1,3 +1,5 @@
+import { projectJsonSchema } from './schema'
+import { validateJsonSchema } from './jsonSchemaValidator'
 import type { ArchitectureProject, LogicStep, ValidationIssue } from './types'
 import { walkSteps } from './utils'
 
@@ -32,6 +34,10 @@ export const validateProject = (project: ArchitectureProject): ValidationIssue[]
   const apiIds = new Set(project.apis.map((item) => item.id))
   const tableIds = new Set(project.databases.flatMap((db) => db.tables.map((table) => table.id)))
   const endpointIds = new Set(project.apis.flatMap((api) => api.endpoints.map((endpoint) => endpoint.id)))
+
+  validateJsonSchema(project, projectJsonSchema).forEach((error) => {
+    pushIssue(issues, 'critical', error.message, error.path)
+  })
 
   ;[
     ...project.folders,

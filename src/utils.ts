@@ -16,6 +16,25 @@ export const walkSteps = (steps: LogicStep[], visitor: (step: LogicStep) => void
   })
 }
 
+export const mapSteps = (steps: LogicStep[], mapper: (step: LogicStep) => LogicStep): LogicStep[] =>
+  steps.map((step) => {
+    const nestedStep =
+      step.type === 'conditional'
+        ? {
+            ...step,
+            trueBranch: mapSteps(step.trueBranch, mapper),
+            falseBranch: mapSteps(step.falseBranch, mapper),
+          }
+        : step.type === 'loop'
+          ? {
+              ...step,
+              steps: mapSteps(step.steps, mapper),
+            }
+          : step
+
+    return mapper(nestedStep)
+  })
+
 export const findStep = (steps: LogicStep[], stepId: string): LogicStep | null => {
   for (const step of steps) {
     if (step.id === stepId) {
@@ -34,6 +53,9 @@ export const findStep = (steps: LogicStep[], stepId: string): LogicStep | null =
   }
   return null
 }
+
+export const updateById = <T extends { id: string }>(items: T[], id: string, updater: (item: T) => T) =>
+  items.map((item) => (item.id === id ? updater(item) : item))
 
 export const updateStepInCollection = (
   steps: LogicStep[],
