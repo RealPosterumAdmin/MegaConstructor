@@ -1,5 +1,5 @@
 import type { LogicStep, Selection } from '../../types'
-import { stepTypeLabel } from './FormFields'
+import { stepTypeLabel } from './stepLabels'
 
 export const StepTree = ({
   steps,

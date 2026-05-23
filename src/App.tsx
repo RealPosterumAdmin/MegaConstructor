@@ -6,7 +6,7 @@ import { NavigationSidebar } from './components/editor/NavigationSidebar'
 import { MainCanvas } from './components/editor/MainCanvas'
 import { InspectorPanel } from './components/editor/InspectorPanel'
 import { IssuesPanel } from './components/editor/IssuesPanel'
-import type { ArchitectureProject, LogicStep, Selection, StepType, ViewMode } from './types'
+import type { ArchitectureProject, Selection, StepType, ViewMode } from './types'
 import {
   addChildStep,
   createId,

@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { STEP_TYPE_OPTIONS } from '../../schema'
 import type { StepType } from '../../types'
-
-export const stepTypeLabel = (type: StepType) => type.replaceAll('_', ' ')
+import { stepTypeLabel } from './stepLabels'
 
 export const TextField = ({
   label,

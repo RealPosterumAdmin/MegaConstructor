@@ -12,7 +12,8 @@ import type {
   StepType,
 } from '../../types'
 import { createId, updateById } from '../../utils'
-import { AddStepBar, SelectField, TextAreaField, TextField, stepTypeLabel } from './FormFields'
+import { AddStepBar, SelectField, TextAreaField, TextField } from './FormFields'
+import { stepTypeLabel } from './stepLabels'
 
 const convertStepType = (step: LogicStep, nextType: StepType): LogicStep => {
   const replacement = createEmptyStep(nextType)

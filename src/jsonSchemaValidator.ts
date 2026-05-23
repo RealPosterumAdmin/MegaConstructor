@@ -15,7 +15,7 @@ type JsonSchemaNode = {
   oneOf?: JsonSchemaNode[]
   properties?: Record<string, JsonSchemaNode>
   required?: readonly string[]
-  type?: 'array' | 'boolean' | 'object' | 'string'
+  type?: string
 }
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
