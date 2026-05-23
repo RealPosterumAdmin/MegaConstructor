@@ -111,7 +111,7 @@ export const createEmptyStep = (type: StepType): LogicStep => {
     case 'return_result':
       return { ...base, type, resultRef: '' }
     default:
-      return base
+      return { ...base, type: 'receive_input' }
   }
 }
 

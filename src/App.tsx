@@ -8,8 +8,6 @@ import type {
   ClassNode,
   DataField,
   DataStructure,
-  DatabaseNode,
-  FileNode,
   FolderNode,
   LogicStep,
   MethodNode,
@@ -193,7 +191,7 @@ const StructureTree = ({
   selection: Selection
   onSelect: (selection: Selection) => void
 }) => {
-  const renderFolder = (folder: FolderNode, depth = 0): JSX.Element => {
+  const renderFolder = (folder: FolderNode, depth = 0) => {
     const childFolders = project.folders.filter((item) => item.parentFolderId === folder.id)
     const childFiles = project.files.filter((item) => item.folderId === folder.id)
     return (
