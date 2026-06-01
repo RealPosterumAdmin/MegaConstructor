@@ -43,7 +43,7 @@ const stepBaseRequired = ['id', 'type', 'title', 'description', 'inputRef', 'out
 export const projectJsonSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
   $id: 'https://megaconstructor.local/schema/project-v1.json',
-  title: 'MegaConstructor project schema v1',
+  title: 'Схема проекта MegaConstructor v1',
   type: 'object',
   additionalProperties: false,
   required: [
@@ -417,7 +417,7 @@ export const createEmptyStep = (type: StepType): LogicStep => {
   const base = {
     id: `${type}-${Math.random().toString(36).slice(2, 9)}`,
     type,
-    title: 'New step',
+    title: 'Новый шаг',
     description: '',
     inputRef: '',
     outputRef: '',
@@ -441,7 +441,7 @@ export const createEmptyStep = (type: StepType): LogicStep => {
         falseBranch: [],
       }
     case 'loop':
-      return { ...base, type, mode: 'forEach', collectionRef: '', itemName: 'item', steps: [] }
+      return { ...base, type, mode: 'forEach', collectionRef: '', itemName: 'элемент', steps: [] }
     case 'manual_action':
       return { ...base, type, instruction: '' }
     case 'log':
@@ -463,7 +463,7 @@ export const createEmptyStep = (type: StepType): LogicStep => {
 
 export const createEmptyStructure = (): DataStructure => ({
   id: `type-${Math.random().toString(36).slice(2, 9)}`,
-  name: 'NewStructure',
+  name: 'НоваяСтруктура',
   kind: 'object',
   description: '',
   fields: [],
@@ -472,10 +472,10 @@ export const createEmptyStructure = (): DataStructure => ({
 export const createEmptyProject = (): ArchitectureProject => ({
   schemaVersion: SCHEMA_VERSION,
   meta: {
-    name: 'New project',
-    description: 'Architecture model',
+    name: 'Новый проект',
+    description: 'Архитектурная модель',
     entryFileName: 'src/main.ts',
-    owner: 'team',
+    owner: 'команда',
   },
   folders: [],
   files: [],

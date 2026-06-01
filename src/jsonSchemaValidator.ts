@@ -21,11 +21,11 @@ type JsonSchemaNode = {
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
-const formatPath = (path: string) => (path ? path : 'root')
+const formatPath = (path: string) => (path ? path : 'корень')
 
 const resolveRef = (root: JsonSchemaNode, ref: string): JsonSchemaNode => {
   if (!ref.startsWith('#/')) {
-    throw new Error(`Unsupported JSON Schema ref: ${ref}`)
+    throw new Error(`Неподдерживаемая ссылка JSON Schema: ${ref}`)
   }
 
   return ref
@@ -34,7 +34,7 @@ const resolveRef = (root: JsonSchemaNode, ref: string): JsonSchemaNode => {
     .reduce<JsonSchemaNode>((current, segment) => {
       const next = (current as Record<string, unknown>)[segment]
       if (!next || typeof next !== 'object') {
-        throw new Error(`Unable to resolve JSON Schema ref: ${ref}`)
+        throw new Error(`Не удалось разрешить ссылку JSON Schema: ${ref}`)
       }
       return next as JsonSchemaNode
     }, root)
@@ -59,7 +59,7 @@ const validateNode = (
     if (matches.length !== 1) {
       errors.push({
         path: formatPath(path),
-        message: 'Value does not match any allowed schema variant.',
+        message: 'Значение не соответствует ни одному допустимому варианту схемы.',
       })
     }
     return
@@ -68,7 +68,7 @@ const validateNode = (
   if (Object.prototype.hasOwnProperty.call(activeSchema, 'const') && value !== activeSchema.const) {
     errors.push({
       path: formatPath(path),
-      message: `Expected ${JSON.stringify(activeSchema.const)}.`,
+      message: `Ожидалось значение ${JSON.stringify(activeSchema.const)}.`,
     })
     return
   }
@@ -76,7 +76,7 @@ const validateNode = (
   if (activeSchema.enum && !activeSchema.enum.includes(value)) {
     errors.push({
       path: formatPath(path),
-      message: `Expected one of ${activeSchema.enum.map((item) => JSON.stringify(item)).join(', ')}.`,
+      message: `Ожидалось одно из значений: ${activeSchema.enum.map((item) => JSON.stringify(item)).join(', ')}.`,
     })
     return
   }
@@ -84,14 +84,14 @@ const validateNode = (
   switch (activeSchema.type) {
     case 'object': {
       if (!isPlainObject(value)) {
-        errors.push({ path: formatPath(path), message: 'Expected an object.' })
+        errors.push({ path: formatPath(path), message: 'Ожидался объект.' })
         return
       }
 
       const properties = activeSchema.properties ?? {}
       activeSchema.required?.forEach((key) => {
         if (!(key in value)) {
-          errors.push({ path: formatPath(path ? `${path}.${key}` : key), message: 'Missing required field.' })
+          errors.push({ path: formatPath(path ? `${path}.${key}` : key), message: 'Отсутствует обязательное поле.' })
         }
       })
 
@@ -104,7 +104,7 @@ const validateNode = (
       if (activeSchema.additionalProperties === false) {
         Object.keys(value).forEach((key) => {
           if (!(key in properties)) {
-            errors.push({ path: formatPath(path ? `${path}.${key}` : key), message: 'Unknown field is not allowed.' })
+            errors.push({ path: formatPath(path ? `${path}.${key}` : key), message: 'Неизвестное поле не допускается.' })
           }
         })
       }
@@ -113,12 +113,12 @@ const validateNode = (
 
     case 'array': {
       if (!Array.isArray(value)) {
-        errors.push({ path: formatPath(path), message: 'Expected an array.' })
+        errors.push({ path: formatPath(path), message: 'Ожидался массив.' })
         return
       }
 
       if (activeSchema.minItems !== undefined && value.length < activeSchema.minItems) {
-        errors.push({ path: formatPath(path), message: `Expected at least ${activeSchema.minItems} items.` })
+        errors.push({ path: formatPath(path), message: `Ожидалось минимум ${activeSchema.minItems} элементов.` })
       }
 
       if (activeSchema.items) {
@@ -131,19 +131,19 @@ const validateNode = (
 
     case 'string': {
       if (typeof value !== 'string') {
-        errors.push({ path: formatPath(path), message: 'Expected a string.' })
+        errors.push({ path: formatPath(path), message: 'Ожидалась строка.' })
         return
       }
 
       if (activeSchema.minLength !== undefined && value.length < activeSchema.minLength) {
-        errors.push({ path: formatPath(path), message: `Expected at least ${activeSchema.minLength} characters.` })
+        errors.push({ path: formatPath(path), message: `Ожидалось минимум ${activeSchema.minLength} символов.` })
       }
       return
     }
 
     case 'boolean': {
       if (typeof value !== 'boolean') {
-        errors.push({ path: formatPath(path), message: 'Expected a boolean.' })
+        errors.push({ path: formatPath(path), message: 'Ожидалось булево значение.' })
       }
       return
     }

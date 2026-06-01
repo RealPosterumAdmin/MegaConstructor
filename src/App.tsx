@@ -42,9 +42,9 @@ const downloadText = (filename: string, text: string) => {
 }
 
 function App() {
-  const [project, setProject] = useState<ArchitectureProject>(() => syncProjectReferences(sampleProject))
-  const [viewMode, setViewMode] = useState<ViewMode>('logic')
-  const [selection, setSelection] = useState<Selection>({ kind: 'scenario', id: sampleProject.scenarios[0].id })
+  const [project, setProject] = useState<ArchitectureProject>(() => createEmptyProject())
+  const [viewMode, setViewMode] = useState<ViewMode>('code')
+  const [selection, setSelection] = useState<Selection>({ kind: 'project' })
   const [searchQuery, setSearchQuery] = useState('')
   const [issueSearchQuery, setIssueSearchQuery] = useState('')
   const [issueSeverityFilter, setIssueSeverityFilter] = useState<'all' | 'critical' | 'warning' | 'info'>('all')
@@ -98,9 +98,9 @@ function App() {
         ...current.scenarios,
         {
           id: scenarioId,
-          name: 'New scenario',
+          name: 'Новый сценарий',
           description: '',
-          trigger: { id: createId('trigger'), name: 'New trigger', type: 'http_request', description: '' },
+          trigger: { id: createId('trigger'), name: 'Новый триггер', type: 'http_request', description: '' },
           requestTypeId: '',
           responseTypeId: '',
           usedClassIds: [],
@@ -111,8 +111,8 @@ function App() {
             {
               id: stepId,
               type: 'return_result',
-              title: 'Return result',
-              description: 'Terminal step',
+              title: 'Вернуть результат',
+              description: 'Завершающий шаг',
               inputRef: '',
               outputRef: '',
               resultRef: '',
@@ -154,7 +154,7 @@ function App() {
         {
           id: methodId,
           classId,
-          name: 'newMethod',
+          name: 'новыйМетод',
           description: '',
           visibility: 'public',
           inputTypeId: '',
@@ -175,7 +175,7 @@ function App() {
         {
           id: classId,
           fileId,
-          name: 'NewClass',
+          name: 'НовыйКласс',
           type: 'service',
           description: '',
           dependencyIds: [],
@@ -189,7 +189,7 @@ function App() {
     const fileId = createId('file')
     updateProject((current) => ({
       ...current,
-      files: [...current.files, { id: fileId, name: 'new-file.ts', folderId, description: '' }],
+      files: [...current.files, { id: fileId, name: 'новый-файл.ts', folderId, description: '' }],
     }))
     setSelection({ kind: 'file', id: fileId })
   }
@@ -198,7 +198,7 @@ function App() {
     const folderId = createId('folder')
     updateProject((current) => ({
       ...current,
-      folders: [...current.folders, { id: folderId, name: 'new-folder', parentFolderId }],
+      folders: [...current.folders, { id: folderId, name: 'новая-папка', parentFolderId }],
     }))
     setSelection({ kind: 'folder', id: folderId })
   }
@@ -209,7 +209,7 @@ function App() {
       ...current,
       dataStructures: [
         ...current.dataStructures,
-        { id: typeId, name: 'NewStructure', kind: 'object', description: '', fields: [] },
+        { id: typeId, name: 'НоваяСтруктура', kind: 'object', description: '', fields: [] },
       ],
     }))
     setSelection({ kind: 'data-structure', id: typeId })
@@ -219,7 +219,7 @@ function App() {
     const databaseId = createId('db')
     updateProject((current) => ({
       ...current,
-      databases: [...current.databases, { id: databaseId, name: 'NewDb', type: 'postgresql', description: '', tables: [] }],
+      databases: [...current.databases, { id: databaseId, name: 'НоваяБД', type: 'postgresql', description: '', tables: [] }],
     }))
     setSelection({ kind: 'database', id: databaseId })
   }
@@ -228,7 +228,7 @@ function App() {
     const apiId = createId('api')
     updateProject((current) => ({
       ...current,
-      apis: [...current.apis, { id: apiId, name: 'New API', baseUrl: 'https://', description: '', endpoints: [] }],
+      apis: [...current.apis, { id: apiId, name: 'Новый API', baseUrl: 'https://', description: '', endpoints: [] }],
     }))
     setSelection({ kind: 'api', id: apiId })
   }
@@ -236,13 +236,13 @@ function App() {
   const parseImportedProject = (raw: string) => {
     const parsed = JSON.parse(raw) as unknown
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      throw new Error('JSON root must be an object.')
+      throw new Error('Корневой элемент JSON должен быть объектом.')
     }
 
     const schemaErrors = validateJsonSchema(parsed, projectJsonSchema)
     if (schemaErrors.length > 0) {
       const preview = schemaErrors.slice(0, 5).map((error) => `${error.path}: ${error.message}`).join(' ')
-      throw new Error(`JSON Schema validation failed. ${preview}`)
+      throw new Error(`Проверка JSON Schema не пройдена. ${preview}`)
     }
 
     return syncProjectReferences(parsed as ArchitectureProject)
@@ -254,7 +254,7 @@ function App() {
     try {
       openProject(parseImportedProject(await file.text()))
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : 'Failed to import file.')
+      window.alert(error instanceof Error ? error.message : 'Не удалось импортировать файл.')
     } finally {
       event.target.value = ''
     }
@@ -326,35 +326,35 @@ function App() {
       <header className="topbar">
         <div>
           <h1>MegaConstructor</h1>
-          <p>React MVP for architecture JSON import, visual editing, validation and export.</p>
+          <p>React MVP для импорта архитектуры из JSON, визуального редактирования, проверки и экспорта.</p>
         </div>
         <div className="toolbar">
           <button type="button" className={viewMode === 'logic' ? 'active' : ''} onClick={() => setViewMode('logic')}>
-            Logic view
+            Логика
           </button>
           <button type="button" className={viewMode === 'code' ? 'active' : ''} onClick={() => setViewMode('code')}>
-            Code view
+            Код
           </button>
-          <button type="button" onClick={() => openProject(createEmptyProject())}>New project</button>
-          <button type="button" onClick={() => openProject(sampleProject)}>Load sample</button>
-          <button type="button" onClick={() => importRef.current?.click()}>Import JSON</button>
+          <button type="button" onClick={() => openProject(createEmptyProject())}>Новый проект</button>
+          <button type="button" onClick={() => openProject(sampleProject)}>Загрузить пример</button>
+          <button type="button" onClick={() => importRef.current?.click()}>Импорт JSON</button>
           <button type="button" onClick={() => downloadText('megaconstructor-project.json', JSON.stringify(project, null, 2))} disabled={criticalIssues > 0}>
-            Export JSON
+            Экспорт JSON
           </button>
           <button type="button" onClick={() => downloadText('megaconstructor-schema-v1.json', JSON.stringify(projectJsonSchema, null, 2))}>
-            Export schema
+            Экспорт схемы
           </button>
           <input ref={importRef} hidden type="file" accept="application/json" onChange={handleImport} />
         </div>
       </header>
 
       <section className="status-strip">
-        <span>Schema version: {project.schemaVersion}</span>
-        <span>Scenarios: {project.scenarios.length}</span>
-        <span>Classes: {project.classes.length}</span>
-        <span>Methods: {project.methods.length}</span>
-        <span>Issues: {issues.length}</span>
-        {criticalIssues > 0 && <strong>{criticalIssues} critical</strong>}
+        <span>Версия схемы: {project.schemaVersion}</span>
+        <span>Сценарии: {project.scenarios.length}</span>
+        <span>Классы: {project.classes.length}</span>
+        <span>Методы: {project.methods.length}</span>
+        <span>Проблемы: {issues.length}</span>
+        {criticalIssues > 0 && <strong>Критичных: {criticalIssues}</strong>}
       </section>
 
       <div className="workspace">

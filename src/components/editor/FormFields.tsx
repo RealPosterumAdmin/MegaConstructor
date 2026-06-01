@@ -73,7 +73,7 @@ export const AddStepBar = ({ onAdd }: { onAdd: (type: StepType) => void }) => {
         ))}
       </select>
       <button type="button" onClick={() => onAdd(value)}>
-        Add step
+        Добавить шаг
       </button>
     </div>
   )
