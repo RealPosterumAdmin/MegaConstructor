@@ -169,12 +169,11 @@ npm run build
 
 The bundled sample demonstrates:
 
-- auth registration and login scenarios;
-- reusable services, validators, repositories, and integrations;
-- request/response structures;
-- database usage;
-- external notification API usage;
-- nested conditional and loop steps.
+- a WordPress plugin blueprint with a physical plugin file layout;
+- separation between file structure and logical business scenario flow;
+- reusable helper behavior modeled through class methods in `includes`;
+- WordPress post publication flow that sends a message to Telegram Bot API;
+- plugin settings and payload structures for post and Telegram data.
 
 ## Tech stack
 
