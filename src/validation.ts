@@ -50,125 +50,125 @@ export const validateProject = (project: ArchitectureProject): ValidationIssue[]
     ...project.apis,
   ].forEach((item) => {
     if (seenIds.has(item.id)) {
-      pushIssue(issues, 'critical', `Duplicate id detected: ${item.id}`, 'global')
+      pushIssue(issues, 'critical', `Обнаружен повторяющийся идентификатор: ${item.id}`, 'глобально')
     }
     seenIds.add(item.id)
   })
 
   project.folders.forEach((folder) => {
     if (folder.parentFolderId && !folderIds.has(folder.parentFolderId)) {
-      pushIssue(issues, 'critical', 'Folder parent does not exist.', `folder:${folder.name}`)
+      pushIssue(issues, 'critical', 'Родительская папка не существует.', `папка:${folder.name}`)
     }
   })
 
   project.files.forEach((file) => {
     if (file.folderId && !folderIds.has(file.folderId)) {
-      pushIssue(issues, 'critical', 'File points to a missing folder.', `file:${file.name}`)
+      pushIssue(issues, 'critical', 'Файл ссылается на отсутствующую папку.', `файл:${file.name}`)
     }
   })
 
   project.classes.forEach((item) => {
     if (!fileIds.has(item.fileId)) {
-      pushIssue(issues, 'critical', 'Class points to a missing file.', `class:${item.name}`)
+      pushIssue(issues, 'critical', 'Класс ссылается на отсутствующий файл.', `класс:${item.name}`)
     }
     item.dependencyIds.forEach((dependencyId) => {
       if (!classIds.has(dependencyId)) {
-        pushIssue(issues, 'warning', 'Class dependency is missing.', `class:${item.name}`)
+        pushIssue(issues, 'warning', 'Зависимость класса отсутствует.', `класс:${item.name}`)
       }
     })
   })
 
   project.methods.forEach((method) => {
     if (!classIds.has(method.classId)) {
-      pushIssue(issues, 'critical', 'Method points to a missing class.', `method:${method.name}`)
+      pushIssue(issues, 'critical', 'Метод ссылается на отсутствующий класс.', `метод:${method.name}`)
     }
     if (method.inputTypeId && !typeIds.has(method.inputTypeId)) {
-      pushIssue(issues, 'warning', 'Method input type is missing.', `method:${method.name}`)
+      pushIssue(issues, 'warning', 'Входной тип метода отсутствует.', `метод:${method.name}`)
     }
     if (method.outputTypeId && !typeIds.has(method.outputTypeId)) {
-      pushIssue(issues, 'warning', 'Method output type is missing.', `method:${method.name}`)
+      pushIssue(issues, 'warning', 'Выходной тип метода отсутствует.', `метод:${method.name}`)
     }
     if (!includesTerminalStep(method.steps)) {
-      pushIssue(issues, 'info', 'Method has no terminal return or error step.', `method:${method.name}`)
+      pushIssue(issues, 'info', 'У метода нет завершающего шага возврата результата или ошибки.', `метод:${method.name}`)
     }
   })
 
   project.dataStructures.forEach((structure) => {
     if (structure.kind === 'array' && structure.itemTypeId && !typeIds.has(structure.itemTypeId)) {
-      pushIssue(issues, 'warning', 'Array structure item type is missing.', `type:${structure.name}`)
+      pushIssue(issues, 'warning', 'У массива отсутствует тип элемента.', `тип:${structure.name}`)
     }
   })
 
   project.scenarios.forEach((scenario) => {
     if (scenario.requestTypeId && !typeIds.has(scenario.requestTypeId)) {
-      pushIssue(issues, 'critical', 'Scenario request type is missing.', `scenario:${scenario.name}`)
+      pushIssue(issues, 'critical', 'У сценария отсутствует тип запроса.', `сценарий:${scenario.name}`)
     }
     if (scenario.responseTypeId && !typeIds.has(scenario.responseTypeId)) {
-      pushIssue(issues, 'critical', 'Scenario response type is missing.', `scenario:${scenario.name}`)
+      pushIssue(issues, 'critical', 'У сценария отсутствует тип ответа.', `сценарий:${scenario.name}`)
     }
     if (!includesTerminalStep(scenario.steps)) {
-      pushIssue(issues, 'critical', 'Scenario must end with return_result or throw_error.', `scenario:${scenario.name}`)
+      pushIssue(issues, 'critical', 'Сценарий должен завершаться шагом return_result или throw_error.', `сценарий:${scenario.name}`)
     }
 
     walkSteps(scenario.steps, (step) => {
       if (step.type === 'call_method') {
         if (!classIds.has(step.classId)) {
-          pushIssue(issues, 'critical', 'Scenario step points to a missing class.', `step:${step.title}`)
+          pushIssue(issues, 'critical', 'Шаг сценария ссылается на отсутствующий класс.', `шаг:${step.title}`)
         }
         if (!methodIds.has(step.methodId)) {
-          pushIssue(issues, 'critical', 'Scenario step points to a missing method.', `step:${step.title}`)
+          pushIssue(issues, 'critical', 'Шаг сценария ссылается на отсутствующий метод.', `шаг:${step.title}`)
         }
       }
       if (step.type === 'call_class' && !classIds.has(step.classId)) {
-        pushIssue(issues, 'critical', 'Scenario step points to a missing class.', `step:${step.title}`)
+        pushIssue(issues, 'critical', 'Шаг сценария ссылается на отсутствующий класс.', `шаг:${step.title}`)
       }
       if (step.type === 'save_to_db') {
         if (!databaseIds.has(step.databaseId)) {
-          pushIssue(issues, 'critical', 'Database reference is missing.', `step:${step.title}`)
+          pushIssue(issues, 'critical', 'Отсутствует ссылка на базу данных.', `шаг:${step.title}`)
         }
         if (!tableIds.has(step.tableId)) {
-          pushIssue(issues, 'critical', 'Table reference is missing.', `step:${step.title}`)
+          pushIssue(issues, 'critical', 'Отсутствует ссылка на таблицу.', `шаг:${step.title}`)
         }
       }
       if (step.type === 'call_api') {
         if (!apiIds.has(step.apiId)) {
-          pushIssue(issues, 'critical', 'API reference is missing.', `step:${step.title}`)
+          pushIssue(issues, 'critical', 'Отсутствует ссылка на API.', `шаг:${step.title}`)
         }
         if (!endpointIds.has(step.endpointId)) {
-          pushIssue(issues, 'critical', 'Endpoint reference is missing.', `step:${step.title}`)
+          pushIssue(issues, 'critical', 'Отсутствует ссылка на эндпоинт.', `шаг:${step.title}`)
         }
       }
       if (step.type === 'build_response' && step.responseTypeId && !typeIds.has(step.responseTypeId)) {
-        pushIssue(issues, 'warning', 'Response type is missing.', `step:${step.title}`)
+        pushIssue(issues, 'warning', 'Отсутствует тип ответа.', `шаг:${step.title}`)
       }
       if (step.type === 'conditional' && step.trueBranch.length === 0 && step.falseBranch.length === 0) {
-        pushIssue(issues, 'info', 'Conditional step has no branches yet.', `step:${step.title}`)
+        pushIssue(issues, 'info', 'У условного шага пока нет веток.', `шаг:${step.title}`)
       }
       if (step.type === 'loop' && step.steps.length === 0) {
-        pushIssue(issues, 'info', 'Loop step has no child steps yet.', `step:${step.title}`)
+        pushIssue(issues, 'info', 'У шага цикла пока нет дочерних шагов.', `шаг:${step.title}`)
       }
     })
   })
 
   project.databases.forEach((database) => {
     if (database.tables.length === 0) {
-      pushIssue(issues, 'info', 'Database has no tables defined.', `database:${database.name}`)
+      pushIssue(issues, 'info', 'Для базы данных не определены таблицы.', `база:${database.name}`)
     }
   })
 
   project.apis.forEach((api) => {
     api.endpoints.forEach((endpoint) => {
       if (endpoint.requestTypeId && !typeIds.has(endpoint.requestTypeId)) {
-        pushIssue(issues, 'warning', 'Endpoint request type is missing.', `api:${api.name}/${endpoint.name}`)
+        pushIssue(issues, 'warning', 'У эндпоинта отсутствует тип запроса.', `api:${api.name}/${endpoint.name}`)
       }
       if (endpoint.responseTypeId && !typeIds.has(endpoint.responseTypeId)) {
-        pushIssue(issues, 'warning', 'Endpoint response type is missing.', `api:${api.name}/${endpoint.name}`)
+        pushIssue(issues, 'warning', 'У эндпоинта отсутствует тип ответа.', `api:${api.name}/${endpoint.name}`)
       }
     })
   })
 
   if (project.scenarios.length === 0) {
-    pushIssue(issues, 'critical', 'At least one scenario is required.', 'project')
+    pushIssue(issues, 'critical', 'Нужен хотя бы один сценарий.', 'проект')
   }
 
   return issues

@@ -135,15 +135,15 @@ export const CodeStructureTree = ({
         className={`tree-button ${selection.kind === 'project' ? 'selected' : ''}`}
         onClick={() => onSelect({ kind: 'project' })}
       >
-        🏠 Project overview
+        🏠 Обзор проекта
       </button>
       <section>
-        <h3>Code structure</h3>
+        <h3>Структура кода</h3>
         {rootFolders}
         {rootFiles}
       </section>
       <section>
-        <h3>Data structures</h3>
+        <h3>Структуры данных</h3>
         {visibleStructures.map((structure) => (
           <button
             key={structure.id}
@@ -156,7 +156,7 @@ export const CodeStructureTree = ({
         ))}
       </section>
       <section>
-        <h3>Databases</h3>
+        <h3>Базы данных</h3>
         {visibleDatabases.map((database) => (
           <button
             key={database.id}
@@ -169,7 +169,7 @@ export const CodeStructureTree = ({
         ))}
       </section>
       <section>
-        <h3>APIs</h3>
+        <h3>API</h3>
         {visibleApis.map((api) => (
           <button
             key={api.id}
@@ -181,7 +181,7 @@ export const CodeStructureTree = ({
           </button>
         ))}
       </section>
-      {!hasMatches && <div className="empty-state">No matching entities.</div>}
+      {!hasMatches && <div className="empty-state">Подходящие сущности не найдены.</div>}
     </div>
   )
 }

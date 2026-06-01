@@ -1,4 +1,5 @@
 import type { ValidationIssue } from '../../types'
+import { severityLabel } from './stepLabels'
 
 export const IssuesPanel = ({
   issues,
@@ -25,30 +26,30 @@ export const IssuesPanel = ({
   return (
     <section className="issues-panel">
       <div className="panel-header">
-        <h3>Validation and conflicts</h3>
-        <span>{filteredIssues.length} shown</span>
+        <h3>Проверка и конфликты</h3>
+        <span>Показано: {filteredIssues.length}</span>
       </div>
       <div className="panel-controls">
         <input
           className="sidebar-search"
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.target.value)}
-          placeholder="Search issues"
+          placeholder="Поиск проблем"
         />
         <select value={severityFilter} onChange={(event) => onSeverityFilterChange(event.target.value as 'all' | ValidationIssue['severity'])}>
-          <option value="all">All severities</option>
-          <option value="critical">Critical</option>
-          <option value="warning">Warning</option>
-          <option value="info">Info</option>
+          <option value="all">Все уровни</option>
+          <option value="critical">Критично</option>
+          <option value="warning">Предупреждение</option>
+          <option value="info">Информация</option>
         </select>
       </div>
       <div className="issue-list">
         {filteredIssues.length === 0 ? (
-          <div className="empty-state">No validation issues for current filter.</div>
+          <div className="empty-state">Для текущего фильтра проблем не найдено.</div>
         ) : (
           filteredIssues.map((issue) => (
             <div key={issue.id} className={`issue-item ${issue.severity}`}>
-              <strong>{issue.severity}</strong>
+              <strong>{severityLabel(issue.severity)}</strong>
               <span>{issue.location}</span>
               <p>{issue.message}</p>
             </div>

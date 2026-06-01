@@ -13,7 +13,7 @@ import type {
 } from '../../types'
 import { createId, updateById } from '../../utils'
 import { AddStepBar, SelectField, TextAreaField, TextField } from './FormFields'
-import { stepTypeLabel } from './stepLabels'
+import { classTypeLabel, logLevelLabel, stepTypeLabel, structureKindLabel, visibilityLabel } from './stepLabels'
 
 const convertStepType = (step: LogicStep, nextType: StepType): LogicStep => {
   const replacement = createEmptyStep(nextType)
@@ -137,45 +137,45 @@ export const InspectorPanel = ({
     return (
       <div className="inspector-section">
         <div className="inspector-header-row">
-          <h3>Step editor</h3>
+          <h3>Редактор шага</h3>
           <button type="button" className="danger" onClick={() => actions.deleteStep(mode, ownerId, step.id)}>
-            Delete step
+            Удалить шаг
           </button>
         </div>
         <SelectField
-          label="Step type"
+          label="Тип шага"
           value={step.type}
           onChange={(value) => applyNestedStepUpdate((current) => convertStepType(current, value as StepType))}
           options={STEP_TYPE_OPTIONS.map((item) => ({ label: stepTypeLabel(item), value: item }))}
         />
-        <TextField label="Title" value={step.title} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, title: value }))} />
-        <TextAreaField label="Description" value={step.description} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, description: value }))} />
-        <TextField label="Input ref" value={step.inputRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, inputRef: value }))} />
-        <TextField label="Output ref" value={step.outputRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, outputRef: value }))} />
+        <TextField label="Заголовок" value={step.title} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, title: value }))} />
+        <TextAreaField label="Описание" value={step.description} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, description: value }))} />
+        <TextField label="Ссылка на вход" value={step.inputRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, inputRef: value }))} />
+        <TextField label="Ссылка на выход" value={step.outputRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...current, outputRef: value }))} />
 
         {step.type === 'validate' && (
-          <TextAreaField label="Rule" value={step.rule} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), rule: value }))} />
+          <TextAreaField label="Правило" value={step.rule} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), rule: value }))} />
         )}
         {step.type === 'map_data' && (
-          <TextAreaField label="Mapping" value={step.mapping} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), mapping: value }))} />
+          <TextAreaField label="Преобразование" value={step.mapping} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), mapping: value }))} />
         )}
         {step.type === 'manual_action' && (
-          <TextAreaField label="Instruction" value={step.instruction} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), instruction: value }))} />
+          <TextAreaField label="Инструкция" value={step.instruction} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), instruction: value }))} />
         )}
         {step.type === 'log' && (
           <>
             <SelectField
-              label="Level"
+              label="Уровень"
               value={step.level}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), level: value as typeof step.level }))}
-              options={['debug', 'info', 'warn', 'error'].map((item) => ({ label: item, value: item }))}
+              options={(['debug', 'info', 'warn', 'error'] as const).map((item) => ({ label: logLevelLabel(item), value: item }))}
             />
-            <TextAreaField label="Message" value={step.message} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), message: value }))} />
+            <TextAreaField label="Сообщение" value={step.message} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), message: value }))} />
           </>
         )}
         {step.type === 'call_class' && (
           <SelectField
-            label="Class"
+            label="Класс"
             value={step.classId}
             onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), classId: value }))}
             options={[{ label: '—', value: '' }, ...classOptions]}
@@ -184,13 +184,13 @@ export const InspectorPanel = ({
         {step.type === 'call_method' && (
           <>
             <SelectField
-              label="Class"
+              label="Класс"
               value={step.classId}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), classId: value, methodId: '' }))}
               options={[{ label: '—', value: '' }, ...classOptions]}
             />
             <SelectField
-              label="Method"
+              label="Метод"
               value={step.methodId}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), methodId: value }))}
               options={[{ label: '—', value: '' }, ...methodOptions]}
@@ -199,14 +199,14 @@ export const InspectorPanel = ({
         )}
         {step.type === 'conditional' && (
           <>
-            <TextField label="Condition left" value={step.condition.left} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), condition: { ...step.condition, left: value } }))} />
+            <TextField label="Левая часть условия" value={step.condition.left} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), condition: { ...step.condition, left: value } }))} />
             <SelectField
-              label="Operator"
+              label="Оператор"
               value={step.condition.operator}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), condition: { ...step.condition, operator: value } }))}
               options={['==', '!=', '>', '>=', '<', '<=', 'includes'].map((item) => ({ label: item, value: item }))}
             />
-            <TextField label="Condition right" value={step.condition.right} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), condition: { ...step.condition, right: value } }))} />
+            <TextField label="Правая часть условия" value={step.condition.right} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), condition: { ...step.condition, right: value } }))} />
             <div className="stacked-buttons">
               <AddStepBar onAdd={(type) => actions.appendChildStep(mode, ownerId, step.id, 'true', type)} />
               <AddStepBar onAdd={(type) => actions.appendChildStep(mode, ownerId, step.id, 'false', type)} />
@@ -216,34 +216,34 @@ export const InspectorPanel = ({
         {step.type === 'loop' && (
           <>
             <SelectField
-              label="Mode"
+              label="Режим"
               value={step.mode}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), mode: value as typeof step.mode }))}
               options={[
-                { label: 'forEach', value: 'forEach' },
-                { label: 'while', value: 'while' },
+                { label: 'Для каждого элемента', value: 'forEach' },
+                { label: 'Пока условие истинно', value: 'while' },
               ]}
             />
-            <TextField label="Collection ref" value={step.collectionRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), collectionRef: value }))} />
-            <TextField label="Item name" value={step.itemName} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), itemName: value }))} />
+            <TextField label="Ссылка на коллекцию" value={step.collectionRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), collectionRef: value }))} />
+            <TextField label="Имя элемента" value={step.itemName} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), itemName: value }))} />
             <AddStepBar onAdd={(type) => actions.appendChildStep(mode, ownerId, step.id, 'loop', type)} />
           </>
         )}
         {step.type === 'save_to_db' && (
           <>
             <SelectField
-              label="Database"
+              label="База данных"
               value={step.databaseId}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), databaseId: value, tableId: '' }))}
               options={databaseOptions}
             />
             <SelectField
-              label="Table"
+              label="Таблица"
               value={step.tableId}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), tableId: value }))}
               options={tableOptions}
             />
-            <TextField label="Operation" value={step.operation} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), operation: value }))} />
+            <TextField label="Операция" value={step.operation} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), operation: value }))} />
           </>
         )}
         {step.type === 'call_api' && (
@@ -255,7 +255,7 @@ export const InspectorPanel = ({
               options={apiOptions}
             />
             <SelectField
-              label="Endpoint"
+              label="Эндпоинт"
               value={step.endpointId}
               onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), endpointId: value }))}
               options={endpointOptions}
@@ -264,7 +264,7 @@ export const InspectorPanel = ({
         )}
         {step.type === 'build_response' && (
           <SelectField
-            label="Response type"
+            label="Тип ответа"
             value={step.responseTypeId}
             onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), responseTypeId: value }))}
             options={typeOptions}
@@ -272,12 +272,12 @@ export const InspectorPanel = ({
         )}
         {step.type === 'throw_error' && (
           <>
-            <TextField label="Error code" value={step.errorCode} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), errorCode: value }))} />
-            <TextAreaField label="Message" value={step.message} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), message: value }))} />
+            <TextField label="Код ошибки" value={step.errorCode} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), errorCode: value }))} />
+            <TextAreaField label="Сообщение" value={step.message} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), message: value }))} />
           </>
         )}
         {step.type === 'return_result' && (
-          <TextField label="Result ref" value={step.resultRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), resultRef: value }))} />
+          <TextField label="Ссылка на результат" value={step.resultRef} onChange={(value) => applyNestedStepUpdate((current) => ({ ...(current as typeof step), resultRef: value }))} />
         )}
       </div>
     )
@@ -287,16 +287,16 @@ export const InspectorPanel = ({
     return (
       <aside className="inspector">
         <div className="inspector-section">
-          <h3>Project settings</h3>
-          <TextField label="Project name" value={project.meta.name} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, name: value } }))} />
-          <TextAreaField label="Description" value={project.meta.description} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, description: value } }))} />
-          <TextField label="Entry file" value={project.meta.entryFileName} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, entryFileName: value } }))} />
-          <TextField label="Owner" value={project.meta.owner} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, owner: value } }))} />
+          <h3>Настройки проекта</h3>
+          <TextField label="Название проекта" value={project.meta.name} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, name: value } }))} />
+          <TextAreaField label="Описание" value={project.meta.description} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, description: value } }))} />
+          <TextField label="Файл входа" value={project.meta.entryFileName} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, entryFileName: value } }))} />
+          <TextField label="Владелец" value={project.meta.owner} onChange={(value) => actions.updateProject((current) => ({ ...current, meta: { ...current.meta, owner: value } }))} />
           <div className="stacked-buttons">
-            <button type="button" onClick={() => actions.addFolder(null)}>Add root folder</button>
-            <button type="button" onClick={actions.addDataStructure}>Add data structure</button>
-            <button type="button" onClick={actions.addDatabase}>Add database</button>
-            <button type="button" onClick={actions.addApi}>Add API</button>
+            <button type="button" onClick={() => actions.addFolder(null)}>Добавить корневую папку</button>
+            <button type="button" onClick={actions.addDataStructure}>Добавить структуру данных</button>
+            <button type="button" onClick={actions.addDatabase}>Добавить базу данных</button>
+            <button type="button" onClick={actions.addApi}>Добавить API</button>
           </div>
         </div>
       </aside>
@@ -309,16 +309,16 @@ export const InspectorPanel = ({
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>Scenario editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteScenario(currentScenario.id)}>Delete scenario</button>
+            <h3>Редактор сценария</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteScenario(currentScenario.id)}>Удалить сценарий</button>
           </div>
-          <TextField label="Name" value={currentScenario.name} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, name: value })) }))} />
-          <TextAreaField label="Description" value={currentScenario.description} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, description: value })) }))} />
-          <TextField label="Trigger name" value={currentScenario.trigger.name} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, trigger: { ...scenario.trigger, name: value } })) }))} />
-          <TextField label="Trigger type" value={currentScenario.trigger.type} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, trigger: { ...scenario.trigger, type: value } })) }))} />
-          <TextAreaField label="Trigger description" value={currentScenario.trigger.description} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, trigger: { ...scenario.trigger, description: value } })) }))} />
-          <SelectField label="Request type" value={currentScenario.requestTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, requestTypeId: value })) }))} options={typeOptions} />
-          <SelectField label="Response type" value={currentScenario.responseTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, responseTypeId: value })) }))} options={typeOptions} />
+          <TextField label="Название" value={currentScenario.name} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, name: value })) }))} />
+          <TextAreaField label="Описание" value={currentScenario.description} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, description: value })) }))} />
+          <TextField label="Название триггера" value={currentScenario.trigger.name} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, trigger: { ...scenario.trigger, name: value } })) }))} />
+          <TextField label="Тип триггера" value={currentScenario.trigger.type} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, trigger: { ...scenario.trigger, type: value } })) }))} />
+          <TextAreaField label="Описание триггера" value={currentScenario.trigger.description} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, trigger: { ...scenario.trigger, description: value } })) }))} />
+          <SelectField label="Тип запроса" value={currentScenario.requestTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, requestTypeId: value })) }))} options={typeOptions} />
+          <SelectField label="Тип ответа" value={currentScenario.responseTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, scenarios: updateById(current.scenarios, currentScenario.id, (scenario) => ({ ...scenario, responseTypeId: value })) }))} options={typeOptions} />
           <AddStepBar onAdd={(type) => actions.addRootStepToScenario(currentScenario.id, type)} />
         </div>
       </aside>
@@ -332,19 +332,19 @@ export const InspectorPanel = ({
   if (selection.kind === 'folder') {
     const folder = project.folders.find((item) => item.id === selection.id)
     if (!folder) return <aside className="inspector" />
-    const parentOptions = [{ label: 'Root', value: '' }, ...project.folders.filter((item) => item.id !== folder.id).map((item) => ({ label: item.name, value: item.id }))]
+    const parentOptions = [{ label: 'Корень', value: '' }, ...project.folders.filter((item) => item.id !== folder.id).map((item) => ({ label: item.name, value: item.id }))]
     return (
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>Folder editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteFolder(folder.id)}>Delete folder</button>
+            <h3>Редактор папки</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteFolder(folder.id)}>Удалить папку</button>
           </div>
-          <TextField label="Name" value={folder.name} onChange={(value) => actions.updateProject((current) => ({ ...current, folders: updateById(current.folders, folder.id, (item) => ({ ...item, name: value })) }))} />
-          <SelectField label="Parent folder" value={folder.parentFolderId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, folders: updateById(current.folders, folder.id, (item) => ({ ...item, parentFolderId: value || null })) }))} options={parentOptions} />
+          <TextField label="Название" value={folder.name} onChange={(value) => actions.updateProject((current) => ({ ...current, folders: updateById(current.folders, folder.id, (item) => ({ ...item, name: value })) }))} />
+          <SelectField label="Родительская папка" value={folder.parentFolderId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, folders: updateById(current.folders, folder.id, (item) => ({ ...item, parentFolderId: value || null })) }))} options={parentOptions} />
           <div className="stacked-buttons">
-            <button type="button" onClick={() => actions.addFolder(folder.id)}>Add subfolder</button>
-            <button type="button" onClick={() => actions.addFile(folder.id)}>Add file</button>
+            <button type="button" onClick={() => actions.addFolder(folder.id)}>Добавить подпапку</button>
+            <button type="button" onClick={() => actions.addFile(folder.id)}>Добавить файл</button>
           </div>
         </div>
       </aside>
@@ -354,18 +354,18 @@ export const InspectorPanel = ({
   if (selection.kind === 'file') {
     const file = project.files.find((item) => item.id === selection.id)
     if (!file) return <aside className="inspector" />
-    const folderOptions = [{ label: 'Root', value: '' }, ...project.folders.map((item) => ({ label: item.name, value: item.id }))]
+    const folderOptions = [{ label: 'Корень', value: '' }, ...project.folders.map((item) => ({ label: item.name, value: item.id }))]
     return (
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>File editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteFile(file.id)}>Delete file</button>
+            <h3>Редактор файла</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteFile(file.id)}>Удалить файл</button>
           </div>
-          <TextField label="Name" value={file.name} onChange={(value) => actions.updateProject((current) => ({ ...current, files: updateById(current.files, file.id, (item) => ({ ...item, name: value })) }))} />
-          <SelectField label="Folder" value={file.folderId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, files: updateById(current.files, file.id, (item) => ({ ...item, folderId: value || null })) }))} options={folderOptions} />
-          <TextAreaField label="Description" value={file.description} onChange={(value) => actions.updateProject((current) => ({ ...current, files: updateById(current.files, file.id, (item) => ({ ...item, description: value })) }))} />
-          <button type="button" onClick={() => actions.addClass(file.id)}>Add class</button>
+          <TextField label="Название" value={file.name} onChange={(value) => actions.updateProject((current) => ({ ...current, files: updateById(current.files, file.id, (item) => ({ ...item, name: value })) }))} />
+          <SelectField label="Папка" value={file.folderId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, files: updateById(current.files, file.id, (item) => ({ ...item, folderId: value || null })) }))} options={folderOptions} />
+          <TextAreaField label="Описание" value={file.description} onChange={(value) => actions.updateProject((current) => ({ ...current, files: updateById(current.files, file.id, (item) => ({ ...item, description: value })) }))} />
+          <button type="button" onClick={() => actions.addClass(file.id)}>Добавить класс</button>
         </div>
       </aside>
     )
@@ -380,15 +380,15 @@ export const InspectorPanel = ({
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>Class editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteClass(currentClass.id)}>Delete class</button>
+            <h3>Редактор класса</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteClass(currentClass.id)}>Удалить класс</button>
           </div>
-          <TextField label="Name" value={currentClass.name} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, name: value })) }))} />
-          <SelectField label="Type" value={currentClass.type} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, type: value as ClassNode['type'] })) }))} options={CLASS_TYPE_OPTIONS.map((item) => ({ label: item, value: item }))} />
-          <SelectField label="File" value={currentClass.fileId} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, fileId: value })) }))} options={fileOptions} />
-          <TextAreaField label="Description" value={currentClass.description} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, description: value })) }))} />
-          <TextAreaField label="Dependencies (comma separated ids)" value={dependencyValue} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, dependencyIds: value.split(',').map((entry) => entry.trim()).filter(Boolean) })) }))} />
-          <button type="button" onClick={() => actions.addMethod(currentClass.id)}>Add method</button>
+          <TextField label="Название" value={currentClass.name} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, name: value })) }))} />
+          <SelectField label="Тип" value={currentClass.type} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, type: value as ClassNode['type'] })) }))} options={CLASS_TYPE_OPTIONS.map((item) => ({ label: classTypeLabel(item), value: item }))} />
+          <SelectField label="Файл" value={currentClass.fileId} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, fileId: value })) }))} options={fileOptions} />
+          <TextAreaField label="Описание" value={currentClass.description} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, description: value })) }))} />
+          <TextAreaField label="Зависимости (id через запятую)" value={dependencyValue} onChange={(value) => actions.updateProject((current) => ({ ...current, classes: updateById(current.classes, currentClass.id, (item) => ({ ...item, dependencyIds: value.split(',').map((entry) => entry.trim()).filter(Boolean) })) }))} />
+          <button type="button" onClick={() => actions.addMethod(currentClass.id)}>Добавить метод</button>
         </div>
       </aside>
     )
@@ -400,14 +400,14 @@ export const InspectorPanel = ({
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>Method editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteMethod(currentMethod.id)}>Delete method</button>
+            <h3>Редактор метода</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteMethod(currentMethod.id)}>Удалить метод</button>
           </div>
-          <TextField label="Name" value={currentMethod.name} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, name: value })) }))} />
-          <TextAreaField label="Description" value={currentMethod.description} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, description: value })) }))} />
-          <SelectField label="Visibility" value={currentMethod.visibility} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, visibility: value as MethodNode['visibility'] })) }))} options={['public', 'protected', 'private'].map((item) => ({ label: item, value: item }))} />
-          <SelectField label="Input type" value={currentMethod.inputTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, inputTypeId: value })) }))} options={typeOptions} />
-          <SelectField label="Output type" value={currentMethod.outputTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, outputTypeId: value })) }))} options={typeOptions} />
+          <TextField label="Название" value={currentMethod.name} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, name: value })) }))} />
+          <TextAreaField label="Описание" value={currentMethod.description} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, description: value })) }))} />
+          <SelectField label="Видимость" value={currentMethod.visibility} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, visibility: value as MethodNode['visibility'] })) }))} options={(['public', 'protected', 'private'] as const).map((item) => ({ label: visibilityLabel(item), value: item }))} />
+          <SelectField label="Тип входных данных" value={currentMethod.inputTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, inputTypeId: value })) }))} options={typeOptions} />
+          <SelectField label="Тип выходных данных" value={currentMethod.outputTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, methods: updateById(current.methods, currentMethod.id, (item) => ({ ...item, outputTypeId: value })) }))} options={typeOptions} />
           <AddStepBar onAdd={(type) => actions.addRootStepToMethod(currentMethod.id, type)} />
         </div>
       </aside>
@@ -435,8 +435,8 @@ export const InspectorPanel = ({
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>Structure editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteDataStructure(structure.id)}>Delete structure</button>
+            <h3>Редактор структуры</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteDataStructure(structure.id)}>Удалить структуру</button>
           </div>
           <button
             type="button"
@@ -447,32 +447,32 @@ export const InspectorPanel = ({
                   ...item,
                   fields: [
                     ...item.fields,
-                    { id: createId('field'), name: 'field', type: 'string', required: false, description: '', source: '', example: '' },
+                    { id: createId('field'), name: 'поле', type: 'string', required: false, description: '', source: '', example: '' },
                   ],
                 })),
               }))
             }
           >
-            Add field
+            Добавить поле
           </button>
-          <TextField label="Name" value={structure.name} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, name: value })) }))} />
-          <SelectField label="Kind" value={structure.kind} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, kind: value as DataStructure['kind'] })) }))} options={['primitive', 'object', 'array'].map((item) => ({ label: item, value: item }))} />
-          <TextAreaField label="Description" value={structure.description} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, description: value })) }))} />
-          {structure.kind === 'primitive' && <TextField label="Primitive type" value={structure.primitiveType ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, primitiveType: value })) }))} />}
-          {structure.kind === 'array' && <SelectField label="Item type" value={structure.itemTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, itemTypeId: value })) }))} options={structureOptions} />}
+          <TextField label="Название" value={structure.name} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, name: value })) }))} />
+          <SelectField label="Вид" value={structure.kind} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, kind: value as DataStructure['kind'] })) }))} options={(['primitive', 'object', 'array'] as const).map((item) => ({ label: structureKindLabel(item), value: item }))} />
+          <TextAreaField label="Описание" value={structure.description} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, description: value })) }))} />
+          {structure.kind === 'primitive' && <TextField label="Примитивный тип" value={structure.primitiveType ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, primitiveType: value })) }))} />}
+          {structure.kind === 'array' && <SelectField label="Тип элемента" value={structure.itemTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, dataStructures: updateById(current.dataStructures, structure.id, (item) => ({ ...item, itemTypeId: value })) }))} options={structureOptions} />}
           <div className="sub-editor-list">
             {structure.fields.map((field) => (
               <div key={field.id} className="sub-editor-card">
                 <div className="sub-editor-actions">
                   <strong>{field.name}</strong>
-                  <button type="button" className="danger" onClick={() => actions.deleteField(structure.id, field.id)}>Delete field</button>
+                  <button type="button" className="danger" onClick={() => actions.deleteField(structure.id, field.id)}>Удалить поле</button>
                 </div>
-                <TextField label="Field name" value={field.name} onChange={(value) => updateField(field.id, (item) => ({ ...item, name: value }))} />
-                <TextField label="Field type" value={field.type} onChange={(value) => updateField(field.id, (item) => ({ ...item, type: value }))} />
-                <SelectField label="Required" value={field.required ? 'true' : 'false'} onChange={(value) => updateField(field.id, (item) => ({ ...item, required: value === 'true' }))} options={[{ label: 'true', value: 'true' }, { label: 'false', value: 'false' }]} />
-                <TextAreaField label="Description" value={field.description} onChange={(value) => updateField(field.id, (item) => ({ ...item, description: value }))} />
-                <TextField label="Source" value={field.source} onChange={(value) => updateField(field.id, (item) => ({ ...item, source: value }))} />
-                <TextField label="Example" value={field.example} onChange={(value) => updateField(field.id, (item) => ({ ...item, example: value }))} />
+                <TextField label="Название поля" value={field.name} onChange={(value) => updateField(field.id, (item) => ({ ...item, name: value }))} />
+                <TextField label="Тип поля" value={field.type} onChange={(value) => updateField(field.id, (item) => ({ ...item, type: value }))} />
+                <SelectField label="Обязательное" value={field.required ? 'true' : 'false'} onChange={(value) => updateField(field.id, (item) => ({ ...item, required: value === 'true' }))} options={[{ label: 'Да', value: 'true' }, { label: 'Нет', value: 'false' }]} />
+                <TextAreaField label="Описание" value={field.description} onChange={(value) => updateField(field.id, (item) => ({ ...item, description: value }))} />
+                <TextField label="Источник" value={field.source} onChange={(value) => updateField(field.id, (item) => ({ ...item, source: value }))} />
+                <TextField label="Пример" value={field.example} onChange={(value) => updateField(field.id, (item) => ({ ...item, example: value }))} />
               </div>
             ))}
           </div>
@@ -488,23 +488,23 @@ export const InspectorPanel = ({
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>Database editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteDatabase(database.id)}>Delete database</button>
+            <h3>Редактор базы данных</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteDatabase(database.id)}>Удалить базу данных</button>
           </div>
-          <button type="button" onClick={() => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: [...item.tables, { id: createId('table'), name: 'new_table', description: '', fields: [] }] })) }))}>Add table</button>
-          <TextField label="Name" value={database.name} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, name: value })) }))} />
-          <TextField label="Type" value={database.type} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, type: value })) }))} />
-          <TextAreaField label="Description" value={database.description} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, description: value })) }))} />
+          <button type="button" onClick={() => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: [...item.tables, { id: createId('table'), name: 'новая_таблица', description: '', fields: [] }] })) }))}>Добавить таблицу</button>
+          <TextField label="Название" value={database.name} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, name: value })) }))} />
+          <TextField label="Тип" value={database.type} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, type: value })) }))} />
+          <TextAreaField label="Описание" value={database.description} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, description: value })) }))} />
           <div className="sub-editor-list">
             {database.tables.map((table) => (
               <div key={table.id} className="sub-editor-card">
                 <div className="sub-editor-actions">
                   <strong>{table.name}</strong>
-                  <button type="button" className="danger" onClick={() => actions.deleteTable(database.id, table.id)}>Delete table</button>
+                  <button type="button" className="danger" onClick={() => actions.deleteTable(database.id, table.id)}>Удалить таблицу</button>
                 </div>
-                <TextField label="Table name" value={table.name} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: updateById(item.tables, table.id, (entry) => ({ ...entry, name: value })) })) }))} />
-                <TextAreaField label="Description" value={table.description} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: updateById(item.tables, table.id, (entry) => ({ ...entry, description: value })) })) }))} />
-                <TextField label="Fields (comma separated)" value={table.fields.join(', ')} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: updateById(item.tables, table.id, (entry) => ({ ...entry, fields: value.split(',').map((field) => field.trim()).filter(Boolean) })) })) }))} />
+                <TextField label="Название таблицы" value={table.name} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: updateById(item.tables, table.id, (entry) => ({ ...entry, name: value })) })) }))} />
+                <TextAreaField label="Описание" value={table.description} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: updateById(item.tables, table.id, (entry) => ({ ...entry, description: value })) })) }))} />
+                <TextField label="Поля (через запятую)" value={table.fields.join(', ')} onChange={(value) => actions.updateProject((current) => ({ ...current, databases: updateById(current.databases, database.id, (item) => ({ ...item, tables: updateById(item.tables, table.id, (entry) => ({ ...entry, fields: value.split(',').map((field) => field.trim()).filter(Boolean) })) })) }))} />
               </div>
             ))}
           </div>
@@ -521,26 +521,26 @@ export const InspectorPanel = ({
       <aside className="inspector">
         <div className="inspector-section">
           <div className="inspector-header-row">
-            <h3>API editor</h3>
-            <button type="button" className="danger" onClick={() => actions.deleteApi(api.id)}>Delete API</button>
+            <h3>Редактор API</h3>
+            <button type="button" className="danger" onClick={() => actions.deleteApi(api.id)}>Удалить API</button>
           </div>
-          <button type="button" onClick={() => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: [...item.endpoints, { id: createId('endpoint'), name: 'NewEndpoint', method: 'POST', path: '/', description: '', requestTypeId: '', responseTypeId: '' }] })) }))}>Add endpoint</button>
-          <TextField label="Name" value={api.name} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, name: value })) }))} />
-          <TextField label="Base URL" value={api.baseUrl} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, baseUrl: value })) }))} />
-          <TextAreaField label="Description" value={api.description} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, description: value })) }))} />
+          <button type="button" onClick={() => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: [...item.endpoints, { id: createId('endpoint'), name: 'НовыйЭндпоинт', method: 'POST', path: '/', description: '', requestTypeId: '', responseTypeId: '' }] })) }))}>Добавить эндпоинт</button>
+          <TextField label="Название" value={api.name} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, name: value })) }))} />
+          <TextField label="Базовый URL" value={api.baseUrl} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, baseUrl: value })) }))} />
+          <TextAreaField label="Описание" value={api.description} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, description: value })) }))} />
           <div className="sub-editor-list">
             {api.endpoints.map((endpoint) => (
               <div key={endpoint.id} className="sub-editor-card">
                 <div className="sub-editor-actions">
                   <strong>{endpoint.name}</strong>
-                  <button type="button" className="danger" onClick={() => actions.deleteEndpoint(api.id, endpoint.id)}>Delete endpoint</button>
+                  <button type="button" className="danger" onClick={() => actions.deleteEndpoint(api.id, endpoint.id)}>Удалить эндпоинт</button>
                 </div>
-                <TextField label="Endpoint name" value={endpoint.name} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, name: value })) })) }))} />
-                <SelectField label="HTTP method" value={endpoint.method} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, method: value as ApiNode['endpoints'][number]['method'] })) })) }))} options={['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((item) => ({ label: item, value: item }))} />
-                <TextField label="Path" value={endpoint.path} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, path: value })) })) }))} />
-                <TextAreaField label="Description" value={endpoint.description} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, description: value })) })) }))} />
-                <SelectField label="Request type" value={endpoint.requestTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, requestTypeId: value })) })) }))} options={typeOptions} />
-                <SelectField label="Response type" value={endpoint.responseTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, responseTypeId: value })) })) }))} options={typeOptions} />
+                <TextField label="Название эндпоинта" value={endpoint.name} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, name: value })) })) }))} />
+                <SelectField label="HTTP-метод" value={endpoint.method} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, method: value as ApiNode['endpoints'][number]['method'] })) })) }))} options={['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((item) => ({ label: item, value: item }))} />
+                <TextField label="Путь" value={endpoint.path} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, path: value })) })) }))} />
+                <TextAreaField label="Описание" value={endpoint.description} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, description: value })) })) }))} />
+                <SelectField label="Тип запроса" value={endpoint.requestTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, requestTypeId: value })) })) }))} options={typeOptions} />
+                <SelectField label="Тип ответа" value={endpoint.responseTypeId ?? ''} onChange={(value) => actions.updateProject((current) => ({ ...current, apis: updateById(current.apis, api.id, (item) => ({ ...item, endpoints: updateById(item.endpoints, endpoint.id, (entry) => ({ ...entry, responseTypeId: value })) })) }))} options={typeOptions} />
               </div>
             ))}
           </div>
@@ -552,12 +552,12 @@ export const InspectorPanel = ({
   return (
     <aside className="inspector">
       <div className="inspector-section">
-        <h3>Quick actions</h3>
+        <h3>Быстрые действия</h3>
         <div className="stacked-buttons">
-          <button type="button" onClick={actions.addScenario}>Add scenario</button>
-          <button type="button" onClick={actions.addDataStructure}>Add data structure</button>
-          <button type="button" onClick={actions.addDatabase}>Add database</button>
-          <button type="button" onClick={actions.addApi}>Add API</button>
+          <button type="button" onClick={actions.addScenario}>Добавить сценарий</button>
+          <button type="button" onClick={actions.addDataStructure}>Добавить структуру данных</button>
+          <button type="button" onClick={actions.addDatabase}>Добавить базу данных</button>
+          <button type="button" onClick={actions.addApi}>Добавить API</button>
         </div>
       </div>
     </aside>

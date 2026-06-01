@@ -2,6 +2,7 @@ import { projectJsonSchema } from '../../schema'
 import type { ArchitectureProject, ScenarioNode, Selection, StepType, ViewMode, MethodNode } from '../../types'
 import { AddStepBar } from './FormFields'
 import { StepTree } from './StepTree'
+import { classTypeLabel, structureKindLabel, visibilityLabel } from './stepLabels'
 
 export const MainCanvas = ({
   project,
@@ -30,21 +31,21 @@ export const MainCanvas = ({
           <p>{project.meta.description}</p>
         </div>
         <div className="chip-row">
-          <span className="chip">Schema {project.schemaVersion}</span>
-          <span className="chip">Entry {project.meta.entryFileName}</span>
-          <span className="chip">Owner {project.meta.owner}</span>
+          <span className="chip">Схема {project.schemaVersion}</span>
+          <span className="chip">Точка входа: {project.meta.entryFileName}</span>
+          <span className="chip">Владелец: {project.meta.owner}</span>
         </div>
       </div>
       <div className="relation-grid">
-        <div className="relation-card"><strong>{project.scenarios.length}</strong><span>scenarios</span></div>
-        <div className="relation-card"><strong>{project.classes.length}</strong><span>classes</span></div>
-        <div className="relation-card"><strong>{project.methods.length}</strong><span>methods</span></div>
-        <div className="relation-card"><strong>{project.dataStructures.length}</strong><span>types</span></div>
-        <div className="relation-card"><strong>{project.databases.length}</strong><span>databases</span></div>
-        <div className="relation-card"><strong>{project.apis.length}</strong><span>apis</span></div>
+        <div className="relation-card"><strong>{project.scenarios.length}</strong><span>сценариев</span></div>
+        <div className="relation-card"><strong>{project.classes.length}</strong><span>классов</span></div>
+        <div className="relation-card"><strong>{project.methods.length}</strong><span>методов</span></div>
+        <div className="relation-card"><strong>{project.dataStructures.length}</strong><span>типов</span></div>
+        <div className="relation-card"><strong>{project.databases.length}</strong><span>баз данных</span></div>
+        <div className="relation-card"><strong>{project.apis.length}</strong><span>API</span></div>
       </div>
       <div className="panel">
-        <h3>Schema outline</h3>
+        <h3>Структура схемы</h3>
         <pre className="schema-preview">{JSON.stringify(projectJsonSchema, null, 2)}</pre>
       </div>
     </div>
@@ -52,7 +53,7 @@ export const MainCanvas = ({
 
   const renderLogicCanvas = () => {
     if (!currentScenario) {
-      return <div className="empty-state">Select or create a scenario.</div>
+      return <div className="empty-state">Выберите сценарий или создайте новый.</div>
     }
 
     return (
@@ -60,42 +61,42 @@ export const MainCanvas = ({
         <div className="canvas-header">
           <div>
             <h2>{currentScenario.name}</h2>
-            <p>{currentScenario.description || 'Scenario orchestrates the executable logic path.'}</p>
+            <p>{currentScenario.description || 'Сценарий управляет исполняемым логическим потоком.'}</p>
           </div>
           <div className="chip-row">
-            <span className="chip">Trigger: {currentScenario.trigger.type}</span>
-            {currentScenario.requestTypeId && <span className="chip">Request: {project.dataStructures.find((item) => item.id === currentScenario.requestTypeId)?.name}</span>}
-            {currentScenario.responseTypeId && <span className="chip">Response: {project.dataStructures.find((item) => item.id === currentScenario.responseTypeId)?.name}</span>}
+            <span className="chip">Триггер: {currentScenario.trigger.type}</span>
+            {currentScenario.requestTypeId && <span className="chip">Запрос: {project.dataStructures.find((item) => item.id === currentScenario.requestTypeId)?.name}</span>}
+            {currentScenario.responseTypeId && <span className="chip">Ответ: {project.dataStructures.find((item) => item.id === currentScenario.responseTypeId)?.name}</span>}
           </div>
         </div>
         <div className="relation-grid">
           <div className="relation-card">
-            <h3>Used classes</h3>
+            <h3>Используемые классы</h3>
             <ul>
               {currentScenario.usedClassIds.map((id) => <li key={id}>{project.classes.find((item) => item.id === id)?.name ?? id}</li>)}
             </ul>
           </div>
           <div className="relation-card">
-            <h3>Used methods</h3>
+            <h3>Используемые методы</h3>
             <ul>
               {currentScenario.usedMethodIds.map((id) => <li key={id}>{project.methods.find((item) => item.id === id)?.name ?? id}</li>)}
             </ul>
           </div>
           <div className="relation-card">
-            <h3>Infrastructure</h3>
+            <h3>Инфраструктура</h3>
             <ul>
-              {currentScenario.usedDatabaseIds.map((id) => <li key={id}>DB: {project.databases.find((item) => item.id === id)?.name ?? id}</li>)}
+              {currentScenario.usedDatabaseIds.map((id) => <li key={id}>БД: {project.databases.find((item) => item.id === id)?.name ?? id}</li>)}
               {currentScenario.usedApiIds.map((id) => <li key={id}>API: {project.apis.find((item) => item.id === id)?.name ?? id}</li>)}
             </ul>
           </div>
         </div>
         <div className="panel">
           <div className="panel-header">
-            <h3>Scenario flow</h3>
+            <h3>Поток сценария</h3>
             <AddStepBar onAdd={(type) => onAddRootStepToScenario(currentScenario.id, type)} />
           </div>
           {currentScenario.steps.length === 0 ? (
-            <div className="empty-state">Add your first step.</div>
+          <div className="empty-state">Добавьте первый шаг.</div>
           ) : (
             <StepTree
               steps={currentScenario.steps}
@@ -112,27 +113,27 @@ export const MainCanvas = ({
 
   const renderCodeCanvas = () => {
     if (selection.kind === 'method' || selection.kind === 'method-step') {
-      if (!currentMethod) return <div className="empty-state">Method not found.</div>
+      if (!currentMethod) return <div className="empty-state">Метод не найден.</div>
       const owningClass = project.classes.find((item) => item.id === currentMethod.classId)
       return (
         <div className="canvas-layout">
           <div className="canvas-header">
             <div>
               <h2>{currentMethod.name}</h2>
-              <p>{currentMethod.description || 'Detailed method logic and reusable behavior.'}</p>
+              <p>{currentMethod.description || 'Подробная логика метода и переиспользуемое поведение.'}</p>
             </div>
             <div className="chip-row">
-              {owningClass && <span className="chip">Class: {owningClass.name}</span>}
-              <span className="chip">Visibility: {currentMethod.visibility}</span>
+              {owningClass && <span className="chip">Класс: {owningClass.name}</span>}
+              <span className="chip">Видимость: {visibilityLabel(currentMethod.visibility)}</span>
             </div>
           </div>
           <div className="panel">
             <div className="panel-header">
-              <h3>Method internal flow</h3>
+              <h3>Внутренний поток метода</h3>
               <AddStepBar onAdd={(type) => onAddRootStepToMethod(currentMethod.id, type)} />
             </div>
             {currentMethod.steps.length === 0 ? (
-              <div className="empty-state">This method has no internal steps yet.</div>
+              <div className="empty-state">У этого метода пока нет внутренних шагов.</div>
             ) : (
               <StepTree
                 steps={currentMethod.steps}
@@ -149,29 +150,29 @@ export const MainCanvas = ({
 
     if (selection.kind === 'class') {
       const currentClass = project.classes.find((item) => item.id === selection.id)
-      if (!currentClass) return <div className="empty-state">Class not found.</div>
+      if (!currentClass) return <div className="empty-state">Класс не найден.</div>
       const methods = project.methods.filter((item) => item.classId === currentClass.id)
       return (
         <div className="canvas-layout">
           <div className="canvas-header">
             <div>
               <h2>{currentClass.name}</h2>
-              <p>{currentClass.description || 'Reusable code element for logic orchestration.'}</p>
+              <p>{currentClass.description || 'Переиспользуемый элемент кода для оркестрации логики.'}</p>
             </div>
             <div className="chip-row">
-              <span className="chip">Type: {currentClass.type}</span>
-              <span className="chip">Methods: {methods.length}</span>
+              <span className="chip">Тип: {classTypeLabel(currentClass.type)}</span>
+              <span className="chip">Методов: {methods.length}</span>
             </div>
           </div>
           <div className="panel">
             <div className="panel-header">
-              <h3>Methods</h3>
+              <h3>Методы</h3>
             </div>
             <div className="list-grid">
               {methods.map((method) => (
                 <button key={method.id} type="button" className="info-card" onClick={() => onSelect({ kind: 'method', id: method.id })}>
                   <strong>{method.name}</strong>
-                  <span>{method.description || 'No description'}</span>
+                  <span>{method.description || 'Описание отсутствует'}</span>
                 </button>
               ))}
             </div>
@@ -182,27 +183,27 @@ export const MainCanvas = ({
 
     if (selection.kind === 'data-structure') {
       const structure = project.dataStructures.find((item) => item.id === selection.id)
-      if (!structure) return <div className="empty-state">Type not found.</div>
+      if (!structure) return <div className="empty-state">Тип не найден.</div>
       return (
         <div className="canvas-layout">
           <div className="canvas-header">
             <div>
               <h2>{structure.name}</h2>
-              <p>{structure.description || 'Input/output structure definition.'}</p>
+              <p>{structure.description || 'Описание структуры входных и выходных данных.'}</p>
             </div>
             <div className="chip-row">
-              <span className="chip">Kind: {structure.kind}</span>
-              <span className="chip">Fields: {structure.fields.length}</span>
+              <span className="chip">Вид: {structureKindLabel(structure.kind)}</span>
+              <span className="chip">Полей: {structure.fields.length}</span>
             </div>
           </div>
           <div className="panel">
-            <h3>Fields</h3>
+            <h3>Поля</h3>
             <div className="table-list">
               {structure.fields.map((field) => (
                 <div key={field.id} className="table-row">
                   <strong>{field.name}</strong>
                   <span>{field.type}</span>
-                  <span>{field.required ? 'required' : 'optional'}</span>
+                  <span>{field.required ? 'обязательное' : 'необязательное'}</span>
                   <span>{field.description}</span>
                 </div>
               ))}
@@ -214,18 +215,18 @@ export const MainCanvas = ({
 
     if (selection.kind === 'database') {
       const database = project.databases.find((item) => item.id === selection.id)
-      if (!database) return <div className="empty-state">Database not found.</div>
+      if (!database) return <div className="empty-state">База данных не найдена.</div>
       return (
         <div className="canvas-layout">
           <div className="canvas-header">
             <div>
               <h2>{database.name}</h2>
-              <p>{database.description || 'Infrastructure database.'}</p>
+              <p>{database.description || 'Инфраструктурная база данных.'}</p>
             </div>
-            <div className="chip-row"><span className="chip">Type: {database.type}</span></div>
+            <div className="chip-row"><span className="chip">Тип: {database.type}</span></div>
           </div>
           <div className="panel">
-            <h3>Tables</h3>
+            <h3>Таблицы</h3>
             <div className="table-list">
               {database.tables.map((table) => (
                 <div key={table.id} className="table-row stacked">
@@ -242,18 +243,18 @@ export const MainCanvas = ({
 
     if (selection.kind === 'api') {
       const api = project.apis.find((item) => item.id === selection.id)
-      if (!api) return <div className="empty-state">API not found.</div>
+      if (!api) return <div className="empty-state">API не найден.</div>
       return (
         <div className="canvas-layout">
           <div className="canvas-header">
             <div>
               <h2>{api.name}</h2>
-              <p>{api.description || 'External integration.'}</p>
+              <p>{api.description || 'Внешняя интеграция.'}</p>
             </div>
-            <div className="chip-row"><span className="chip">Base URL: {api.baseUrl}</span></div>
+            <div className="chip-row"><span className="chip">Базовый URL: {api.baseUrl}</span></div>
           </div>
           <div className="panel">
-            <h3>Endpoints</h3>
+            <h3>Эндпоинты</h3>
             <div className="table-list">
               {api.endpoints.map((endpoint) => (
                 <div key={endpoint.id} className="table-row">

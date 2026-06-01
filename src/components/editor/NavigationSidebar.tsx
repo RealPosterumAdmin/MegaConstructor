@@ -40,19 +40,19 @@ export const NavigationSidebar = ({
           className="sidebar-search"
           value={searchQuery}
           onChange={(event) => onSearchQueryChange(event.target.value)}
-          placeholder={viewMode === 'logic' ? 'Search scenarios' : 'Search entities'}
+          placeholder={viewMode === 'logic' ? 'Поиск сценариев' : 'Поиск сущностей'}
         />
       </div>
       {viewMode === 'logic' ? (
         <div className="sidebar-tree">
           <div className="sidebar-header-row">
-            <h3>Scenarios</h3>
+            <h3>Сценарии</h3>
             <button type="button" onClick={onAddScenario}>
-              Add scenario
+              Добавить сценарий
             </button>
           </div>
           {filteredScenarios.length === 0 ? (
-            <div className="empty-state">No matching scenarios.</div>
+            <div className="empty-state">Подходящие сценарии не найдены.</div>
           ) : (
             filteredScenarios.map((scenario) => (
               <button
